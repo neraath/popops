@@ -30,6 +30,7 @@ namespace PopOpsWeb
             services.AddAuthentication(AzureADDefaults.BearerAuthenticationScheme)
                 .AddAzureADBearer(options => Configuration.Bind("AzureAd", options));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.Configure<DocumentConfig>(Configuration.GetSection(nameof(DocumentConfig)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

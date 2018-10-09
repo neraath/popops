@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace PopOpsSquarePaymentsWebhook
+namespace PopOps.Model
 {
     public class PaymentUpdate
     {

@@ -1,6 +1,7 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using PopOps.Model;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
