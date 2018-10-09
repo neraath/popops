@@ -1,23 +1,40 @@
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace PopOpsSquarePaymentsWebhook
 {
     public static class GetPaymentDetailsFunction
     {
+        private static HttpClient HttpClient;
+
+        static GetPaymentDetailsFunction()
+        {
+            HttpClient = new HttpClient();
+            HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Environment.GetEnvironmentVariable("SquareAuthToken"));
+        }
+
         [FunctionName("GetPaymentDetailsFunction")]
-        public static void Run(
+        public static async Task Run(
             [ServiceBusTrigger("paymentstopic", "getpaymentdetailssubscription", Connection = "ServiceBusConnection")]
             string paymentUpdateText, 
             ILogger log)
         {
             log.LogInformation($"C# ServiceBus topic trigger function processing message: {paymentUpdateText}");
-            var paymentUpdate = JsonConvert.DeserializeObject<PaymentUpdate>(paymentUpdateText);
-            // TODO: Invoke HTTP Request to get payment details.
-            var paymentResponse = System.IO.File.ReadAllText("SamplePayment.json");
-            var paymentDetails = JsonConvert.DeserializeObject<Payment>(paymentResponse);
-            log.LogInformation($"Payment request is {paymentDetails.Id} ({paymentDetails.CreatedAt}");
+            try
+            {
+                var paymentUpdate = JsonConvert.DeserializeObject<PaymentUpdate>(paymentUpdateText);
+                var paymentHttpResponse = await HttpClient.GetAsync($"https://connect.squareup.com/v1/{paymentUpdate.LocationId}/payments/{paymentUpdate.EntityId}");
+                var paymentDetails = await paymentHttpResponse.Content.ReadAsAsync<Payment>();
+                log.LogInformation($"Payment request is {paymentDetails.Id} ({paymentDetails.CreatedAt})");
+            }
+            catch (Exception e)
+            {
+                log.LogError(e, e.Message);
+            }
         }
     }
 }
