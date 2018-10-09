@@ -5,7 +5,7 @@ using Microsoft.Azure.Documents.Client;
 using Microsoft.Extensions.Options;
 using PopOps.Model;
 
-namespace PopOpsWeb.Controllers
+namespace PopOps.Web.Controllers
 {
     //[Authorize]
     [Route("api/[controller]")]

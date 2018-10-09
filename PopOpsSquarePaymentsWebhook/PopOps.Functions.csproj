@@ -21,9 +21,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Model\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\PopOps.Model\PopOps.Model.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PopOpsWeb
+namespace PopOps.Web
 {
     public class DocumentConfig
     {
