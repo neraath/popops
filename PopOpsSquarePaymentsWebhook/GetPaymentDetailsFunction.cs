@@ -20,7 +20,9 @@ namespace PopOpsSquarePaymentsWebhook
         [FunctionName("GetPaymentDetailsFunction")]
         public static async Task Run(
             [ServiceBusTrigger("paymentstopic", "getpaymentdetailssubscription", Connection = "ServiceBusConnection")]
-            string paymentUpdateText, 
+            string paymentUpdateText,
+            [CosmosDB("popops", "paymentdetails", ConnectionStringSetting = "CosmosDbConnection", CreateIfNotExists = true)]
+            IAsyncCollector<Payment> paymentsCollection,
             ILogger log)
         {
             log.LogInformation($"C# ServiceBus topic trigger function processing message: {paymentUpdateText}");
@@ -30,6 +32,8 @@ namespace PopOpsSquarePaymentsWebhook
                 var paymentHttpResponse = await HttpClient.GetAsync($"https://connect.squareup.com/v1/{paymentUpdate.LocationId}/payments/{paymentUpdate.EntityId}");
                 var paymentDetails = await paymentHttpResponse.Content.ReadAsAsync<Payment>();
                 log.LogInformation($"Payment request is {paymentDetails.Id} ({paymentDetails.CreatedAt})");
+                await paymentsCollection.AddAsync(paymentDetails);
+                log.LogInformation("Document created successfully.");
             }
             catch (Exception e)
             {
